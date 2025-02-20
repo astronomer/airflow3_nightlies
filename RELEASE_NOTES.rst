@@ -23,99 +23,99 @@
 
 Airflow 3.0.0 (2025-04-22)
 --------------------------
-We are proud to announce the General Availability of **Apache Airflow® 3.0**, the most significant release in the
-project's history. Airflow 3.0 builds on the foundation of Airflow 2 and introduces a new service-oriented architecture,
-a modern React-based UI, enhanced security, and a host of long-requested features such as DAG versioning, improved
-backfills, event-driven scheduling, and support for remote execution.
 
-Highlights
-^^^^^^^^^^
+Airflow 3.0 is a huge milestone for the Airflow project; the first major release in over four years, and brings
+great improvements to the entire community.
 
-Major Architectural Advancements
-""""""""""""""""""""""""""""""""
+Highly requested UX features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- **Task Execution API & Task SDK (AIP-72)**: Airflow 3.0 introduces a service-oriented architecture and a new API Server, enabling tasks to run anywhere, in any language, with improved isolation and security.
-- **Edge Executor (AIP-69)**: A new experimental executor that enables edge compute patterns and event-driven orchestration scenarios.
-- **Split CLI (AIP-81)**: The core CLI is now divided between local and remote functionality, with a new provider package (``airflowctl``) for API-based remote interactions.
+DAG Versioning
+""""""""""""""
 
-UI Overhaul
-"""""""""""
+Airflow now tracks DAG versions, providing better visibility into DAG changes over time. This enables users to view
+historical DAG run information, inspect historical DAG structures associated with that historical DAG run and execution states.
 
-- **Modern React UI (AIP-38, AIP-84)**: Airflow's UI has been completely rewritten using React and FastAPI. This new UI supports a better UX across Grid, Graph, and Asset views.
-- **DAG Versioning (AIP-65, AIP-66)**: DAG structure changes are now tracked natively. Users can inspect DAG history directly from the UI.
+Airflow now introduces DAG Bundles which allow tasks run with the correct code version even when DAGs evolve. Airflow also now
+supports the sourcing of these DAG bundles from multiple locations which enables more efficient DAG parsing and better control over refresh behaviour.
 
-Expanded Scheduling and Execution
-"""""""""""""""""""""""""""""""""
+Collectively, these improve observability and reliability across workflows.
 
-- **Data Assets & Asset-Driven DAGs (AIP-74, AIP-75)**: Data-aware scheduling has evolved into first-class Asset support, including a new ``@asset`` decorator syntax and asset-based execution.
-- **External Event Scheduling (AIP-82)**: DAGs can now be triggered from external events via a pluggable message bus interface. Initial support for AWS SQS is included.
-- **Scheduler-Managed Backfills (AIP-78)**: Backfills are now managed by the scheduler, with UI support and enhanced diagnostics.
-
-ML & AI Use Cases
-"""""""""""""""""
-
-- **Support for Non-Data-Interval DAGs (AIP-83)**: Enables inference DAGs and hyperparameter tuning runs by removing the uniqueness constraint on execution dates.
-
-Breaking Changes
-^^^^^^^^^^^^^^^^
-
-See the :doc:`Upgrade Guide <installation/upgrading_to_airflow3>` for a full list of changes and migration recommendations. Major breaking changes include:
-
-Metadata Database Access
-""""""""""""""""""""""""
-
-- Direct access to the metadata DB from task code is no longer supported. Use the :doc:`REST API <stable-rest-api-ref>` instead.
-
-Scheduling Changes
-""""""""""""""""""
-
-- New default: ``schedule=None``, ``catchup=False``
-- ``schedule_interval`` and ``timetable`` are removed; use ``schedule`` exclusively.
-- Raw cron strings now use ``CronTriggerTimetable`` instead of ``CronDataIntervalTimetable``.
-
-Context and Parameters
+Modern Web Application
 """"""""""""""""""""""
 
-- Several context variables removed (``conf``, ``execution_date``, ``dag_run.external_trigger``, etc)
-- ``fail_stop`` renamed to ``fail_fast``
-- ``.airflowignore`` now uses glob syntax by default
+The Airflow UI is now completely React-based and fully API-driven using a new UI REST API.
+This overhaul improves user experience, maintainability and is a foundation for extensibility. Key feature enhancements include a new component-based design system
+(with dark mode) and an improved information architecture.
 
-Deprecated and Removed Features
-"""""""""""""""""""""""""""""""
+We have also removed Flask AppBuilder as a core dependency. However, since FAB remains widely used for authentication and custom plugins,
+we have retained backwards compatibility for FAB plugins to ensure a smooth transition for users, while setting the stage for its eventual removal.
 
-+-----------------------------+----------------------------------------------------------+
-| **Feature**                 | **Replacement**                                          |
-+=============================+==========================================================+
-| SubDAGs                     | Task Groups                                              |
-+-----------------------------+----------------------------------------------------------+
-| SLAs                        | Deadline Alerts (planned post-3.0)                       |
-+-----------------------------+----------------------------------------------------------+
-| ``EmailOperator`` (core)    | SMTP provider's ``EmailOperator``                        |
-+-----------------------------+----------------------------------------------------------+
-| ``dummy`` trigger rule      | ``always``                                               |
-+-----------------------------+----------------------------------------------------------+
-| ``none_failed_or_skipped`` | ``none_failed_min_one_success``                           |
-+-----------------------------+----------------------------------------------------------+
-| XCom pickling               | Use a custom XCom backend                                |
-+-----------------------------+----------------------------------------------------------+
+Additionally, we have introduced a new flexible React-based plugin system to allow:
+- Custom widgets and information panels within the Grid View
+- Enhanced visibility of business-specific workflow details
+- Seamless integration of Airflow UI with external reporting tools like Grafana or Power BI
 
-Upgrade Process
-^^^^^^^^^^^^^^^
+Scheduler-managed Backfills
+"""""""""""""""""""""""""""
 
-Airflow 3 was designed with migration in mind. Many Airflow 2 DAGs will work without changes. Use these tools:
+In Airflow 3.0, Backfills are now first-class citizens, directly integrated into the Airflow scheduler. This enables better
+scalability, diagnostics, and support through the UI / API. This also eliminated redundancy in the scheduling logic, making Airflow more maintainable.
 
-- ``ruff check --preview --select AIR30 --fix``: Flag and auto-fix DAG-level changes
-- ``airflow config lint``: Identify outdated or removed config options
+Airflow 3.0 enables Tasks to be Run anywhere, at any time, in any language
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Minimum version required to upgrade**: Airflow 2.7
+Task Execution Interface
+""""""""""""""""""""""""
 
-We recommend upgrading to the latest Airflow 2.10.x release before migrating to Airflow 3.0 to benefit from deprecation warnings. Check :doc:`Upgrade Guide <installation/upgrading_to_airflow3>` for more details.
+The Task Execution Interface evolves Airflow into a client / server architecture to enable easier upgrades, multi-cloud deployments, and multi-language support.
+This decouples task execution from Airflow internals, eliminating direct interaction from tasks with the Airflow metadatabase. These interactions
+now go through an API, which enables remote execution across network boundaries. This API based interaction also enables multi-language support
+for task execution while keeping DAGs in Python.
+Furthermore, this enhances security and scalability, reducing conflicts in dependency management.
 
-Resources
-^^^^^^^^^
+Edge Executor (Remote Task Execution)
+"""""""""""""""""""""""""""""""""""""
 
-- :doc:`Upgrade Guide <installation/upgrading_to_airflow3>`
-- `Airflow AIPs <https://cwiki.apache.org/confluence/display/AIRFLOW/Airflow+Improvement+Proposals>`_
+The Edge Executor, designed for remote task execution across network boundaries is now based on the Task Execution Interface above.
+This enables seamless execution of tasks in remote environments without requiring direct database or message broker connections,
+making Airflow more scalable across diverse infrastructures.
+
+Data Assets and Event Driven Scheduling
+"""""""""""""""""""""""""""""""""""""""
+
+Airflow is evolving to be a more integrated part of the entire data ecosystem, in better understanding the data it
+operates on and to trigger DAGs based on changes in the surrounding data ecosystem.
+
+Asset-Centric Syntax
+""""""""""""""""""""
+
+Airflow evolution of Datasets into Data Assets enables it to better understand the data it orchestrates. Airflow 3 introduces
+the concept of Data Assets which go beyond physical Datasets such as tables and files to now expand to ML models, etc.
+Airflow 3 enables explicit definition of asset dependencies, making them easier to track and manage. The introduction of the
+@asset decorator streamlines defining assets within DAGs and clarifies dependency chains.
+
+
+External Event-Driven Scheduling in Airflow
+""""""""""""""""""""""""""""""""""""""""""""
+Airflow 3 introduces native event-driven capabilities, allowing DAGs to be triggered by external events like message queues.
+It builds on existing dataset-based scheduling (now referred to as Data Assets) and enhances monitoring, execution efficiency,
+and API support for event-based workflows.
+
+Enhanced Security in CLI via Integration of API
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+Airflow 3 improves the security of Airflow and reduces the maintenance burden by having the CLI use the Airflow APIs
+(now significantly enhanced as detailed above). Evolving to have all access go through the APIs instead of direct database access
+is an important evolution for Airflow. This simplifies CLI deployment, reduces redundancy, and improves maintainability.
+
+Inference execution and hyper-parameter turning
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Airflow currently uses execution_date to identify DAG runs, which introduces limitations, especially for dynamic workflows.
+In Airflow 3, execution_date has been renamed to logical_date and the constraint has selectively been removed to enable DAG
+execution for inference runs to be more intuitive and scalable.
+
 
 Airflow 2.10.5 (2025-02-10)
 ---------------------------
