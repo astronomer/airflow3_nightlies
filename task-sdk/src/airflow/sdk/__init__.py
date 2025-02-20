@@ -44,7 +44,7 @@ __all__ = [
     "literal",
 ]
 
-__version__ = "1.0.0.alpha1"
+__version__ = "1.0.0.dev20250311"
 
 if TYPE_CHECKING:
     from airflow.sdk.definitions.asset import Asset, AssetAlias, AssetAll, AssetAny, AssetWatcher
