@@ -28,7 +28,7 @@ def get_provider_info():
         "description": "`Distributed version control system (GIT) <https://git-scm.com/>`__\n",
         "state": "not-ready",
         "source-date-epoch": 1742823216,
-        "versions": ["0.0.1"],
+        "versions": ["0.0.2.dev202504010001"],
         "integrations": [
             {
                 "integration-name": "GIT (Git)",
