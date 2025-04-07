@@ -50,7 +50,7 @@ __all__ = [
     "literal",
 ]
 
-__version__ = "1.0.0.alpha1"
+__version__ = "1.0.0.dev202504070002"
 
 if TYPE_CHECKING:
     from airflow.sdk.bases.notifier import BaseNotifier
