@@ -25,7 +25,7 @@ state: ready
 source-date-epoch: 1742823216
 # note that those versions are maintained by release manager - do not update them manually
 versions:
-  - 0.0.1
+  - 0.0.2.dev202504100001
 
 integrations:
   - integration-name: GIT (Git)
